@@ -1,0 +1,8 @@
+---
+# Choose which load balancer to use
+enable_nginx_lb: true
+enable_apache_lb: false
+load_balancer_is_required: true
+
+# Other UAT-specific variables
+mysql_root_password: "uat-secure-password"
