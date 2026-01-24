@@ -1,0 +1,5 @@
+---
+# tasks file for sonarqube
+- name: Placeholder task for SonarQube
+  debug:
+    msg: "SonarQube role - tasks to be added"
