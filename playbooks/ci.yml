@@ -1,0 +1,32 @@
+---
+# CI Environment Playbook
+# Manages Jenkins, SonarQube, Artifactory, and Nginx for CI
+
+- name: Configure SonarQube server
+  hosts: sonarqube
+  become: true
+  roles:
+    - sonarqube
+
+- name: Configure Artifactory server
+  hosts: artifact_repository
+  become: true
+  roles:
+    - artifactory
+
+- name: Configure Nginx for CI
+  hosts: nginx
+  become: true
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+    
+    - name: Ensure Nginx is started
+      service:
+        name: nginx
+        state: started
+        enabled: yes

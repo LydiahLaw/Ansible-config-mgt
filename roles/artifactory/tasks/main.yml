@@ -1,0 +1,5 @@
+---
+# tasks file for artifactory
+- name: Placeholder task for Artifactory
+  debug:
+    msg: "Artifactory role - tasks to be added"
