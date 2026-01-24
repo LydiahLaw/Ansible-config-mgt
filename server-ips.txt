@@ -1,9 +1,0 @@
-Jenkins Server: 172.31.21.15
-SonarQube Server: 172.31.29.62
-Artifactory Server: 172.31.25.210
-Nginx-CI Server: 172.31.23.171
-Dev Tooling Server: 172.31.23.139
-Dev TODO Server: 172.31.17.69
-Nginx-Dev Server: 172.31.64.57
-DB-Dev Server: 172.31.24.191
-
