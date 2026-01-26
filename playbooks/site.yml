@@ -1,30 +1,15 @@
 ---
-# Main playbook for all environments
+# Main playbook - just test connectivity at this stage
 
-# Include dynamic variables for all plays
 - hosts: all
-  name: Include dynamic variables
+  name: Test connection to all servers
+  become: true
+  gather_facts: true
+  
   tasks:
-    - import_tasks: ../static-assignments/common.yml
-   # - include_tasks: ../dynamic-assignments/env-vars.yml
-   #   tags:
-   #     - always
-
-# Webserver assignment
-- import_playbook: ../static-assignments/webservers.yml
-
-# Loadbalancers assignment
-- import_playbook: ../static-assignments/loadbalancers.yml
-  when: load_balancer_is_required
-
-# Dev environment - simple testing
-- import_playbook: dev.yml
-  when: inventory_file is defined and 'dev' in inventory_file
-
-# CI environment setup
-- import_playbook: ci.yml
-  when: inventory_file is defined and 'ci' in inventory_file
-
-# Deploy from Artifactory
-# import_playbook: deploy-from-artifactory.yml
-# when: deploy_from_artifactory is defined and deploy_from_artifactory | bool
+    - name: Ping all servers
+      ping:
+    
+    - name: Print server information
+      debug:
+        msg: "Successfully connected to {{ inventory_hostname }} ({{ ansible_distribution }})"
