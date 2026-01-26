@@ -26,5 +26,5 @@
   when: inventory_file is defined and 'ci' in inventory_file
 
 # Deploy from Artifactory
-- import_playbook: deploy-from-artifactory.yml
-  when: deploy_from_artifactory is defined and deploy_from_artifactory | bool
+# import_playbook: deploy-from-artifactory.yml
+# when: deploy_from_artifactory is defined and deploy_from_artifactory | bool
