@@ -1,0 +1,11 @@
+[tooling]
+172.31.23.139 ansible_user=ubuntu ansible_ssh_private_key_file=/home/lydiah/Downloads/tooling.pem ansible_python_interpreter=/usr/bin/python3
+
+[todo]
+172.31.17.69 ansible_user=ubuntu ansible_ssh_private_key_file=/home/lydiah/Downloads/tooling.pem ansible_python_interpreter=/usr/bin/python3
+
+[nginx]
+172.31.64.57 ansible_user=ubuntu ansible_ssh_private_key_file=/home/lydiah/Downloads/tooling.pem ansible_python_interpreter=/usr/bin/python3
+
+[db]
+172.31.24.191 ansible_user=ubuntu ansible_ssh_private_key_file=/home/lydiah/Downloads/tooling.pem ansible_python_interpreter=/usr/bin/python3
