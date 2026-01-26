@@ -20,7 +20,7 @@ pipeline {
 
         stage('Checkout SCM') {
             steps {
-                git branch: 'main', url: 'https://github.com/<YOUR-USERNAME>/ansible-config-mgt.git'
+                git branch: 'main', url: 'https://github.com/LydiahLaw/ansible-config-mgt.git'
             }
         }
 
