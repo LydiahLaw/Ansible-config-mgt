@@ -6,32 +6,25 @@
   name: Include dynamic variables
   tasks:
     - import_tasks: ../static-assignments/common.yml
-    - include: ../dynamic-assignments/env-vars.yml
+    - include_tasks: ../dynamic-assignments/env-vars.yml
       tags:
         - always
 
-# Webserver assignment (from previous project)
-- hosts: webservers
-  name: Webserver assignment
-  import_playbook: ../static-assignments/webservers.yml
+# Webserver assignment
+- import_playbook: ../static-assignments/webservers.yml
 
-# Loadbalancers assignment (from previous project)
-- name: Loadbalancers assignment
-  hosts: lb
-  import_playbook: ../static-assignments/loadbalancers.yml
+# Loadbalancers assignment
+- import_playbook: ../static-assignments/loadbalancers.yml
   when: load_balancer_is_required
 
 # Dev environment - simple testing
-- name: Test connection to dev environment
-  import_playbook: dev.yml
+- import_playbook: dev.yml
   when: inventory_file is defined and 'dev' in inventory_file
 
-# CI environment - for Jenkins, SonarQube, Artifactory
-- name: CI environment setup
-  import_playbook: ci.yml
+# CI environment setup
+- import_playbook: ci.yml
   when: inventory_file is defined and 'ci' in inventory_file
 
-# Deploy from Artifactory (for TODO app deployment)
-- name: Deploy from Artifactory to dev
-  import_playbook: deploy-from-artifactory.yml
+# Deploy from Artifactory
+- import_playbook: deploy-from-artifactory.yml
   when: deploy_from_artifactory is defined and deploy_from_artifactory | bool
