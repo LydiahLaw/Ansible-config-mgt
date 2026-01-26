@@ -6,9 +6,9 @@
   name: Include dynamic variables
   tasks:
     - import_tasks: ../static-assignments/common.yml
-    - include_tasks: ../dynamic-assignments/env-vars.yml
-      tags:
-        - always
+   # - include_tasks: ../dynamic-assignments/env-vars.yml
+   #   tags:
+   #     - always
 
 # Webserver assignment
 - import_playbook: ../static-assignments/webservers.yml
