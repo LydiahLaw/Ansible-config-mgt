@@ -6,11 +6,21 @@ pipeline {
     }
 
     parameters {
-        string(name: 'inventory', defaultValue: 'dev', description: 'This is the inventory file for the environment to deploy configuration')
+        string(
+            name: 'inventory',
+            defaultValue: 'dev',
+            description: 'Inventory file for environment'
+        )
+        string(
+            name: 'ansible_tags',
+            defaultValue: '',
+            description: 'Ansible tags to run specific tasks'
+        )
     }
 
     stages {
-        stage("Initial cleanup") {
+
+        stage('Initial cleanup') {
             steps {
                 dir("${WORKSPACE}") {
                     deleteDir()
@@ -26,27 +36,45 @@ pipeline {
 
         stage('Prepare Ansible For Execution') {
             steps {
-                sh 'echo ${WORKSPACE}'
+                sh '''
+                    echo "Preparing Ansible"
+                    sed -i "s|roles_path=.*|roles_path=${WORKSPACE}/roles|" deploy/ansible.cfg
+                '''
             }
         }
 
         stage('Run Ansible playbook') {
             steps {
-                ansiblePlaybook(
-                    become: true,
-                    colorized: true,
-                    credentialsId: 'private-key',
-                    disableHostKeyChecking: true,
-                    installation: 'ansible',
-                    inventory: 'inventory/${inventory}',
-                    playbook: 'playbooks/site.yml'
-                )
+                script {
+                    def tags = ""
+
+                    if (params.ansible_tags) {
+                        tags = "--tags ${params.ansible_tags}"
+                    }
+
+                    ansiblePlaybook(
+                        become: true,
+                        colorized: true,
+                        credentialsId: 'private-key',
+                        disableHostKeyChecking: true,
+                        installation: 'ansible',
+                        inventory: "inventory/${params.inventory}",
+                        playbook: 'playbooks/site.yml',
+                        extras: tags
+                    )
+                }
             }
         }
 
         stage('Clean Workspace after build') {
             steps {
-                cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenUnstable: true, deleteDirs: true)
+                cleanWs(
+                    cleanWhenAborted: true,
+                    cleanWhenFailure: true,
+                    cleanWhenNotBuilt: true,
+                    cleanWhenUnstable: true,
+                    deleteDirs: true
+                )
             }
         }
     }
