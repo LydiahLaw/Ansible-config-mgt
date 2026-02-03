@@ -6,21 +6,11 @@ pipeline {
     }
 
     parameters {
-        string(
-            name: 'inventory',
-            defaultValue: 'dev',
-            description: 'Inventory file for environment'
-        )
-        string(
-            name: 'ansible_tags',
-            defaultValue: '',
-            description: 'Ansible tags to run specific tasks'
-        )
+        string(name: 'inventory', defaultValue: 'dev', description: 'Target environment inventory')
     }
 
     stages {
-
-        stage('Initial cleanup') {
+        stage("Initial cleanup") {
             steps {
                 dir("${WORKSPACE}") {
                     deleteDir()
@@ -36,45 +26,28 @@ pipeline {
 
         stage('Prepare Ansible For Execution') {
             steps {
-                sh '''
-                    echo "Preparing Ansible"
-                    sed -i "s|roles_path=.*|roles_path=${WORKSPACE}/roles|" deploy/ansible.cfg
-                '''
+                sh 'echo ${WORKSPACE}'
+                sh 'sed -i "3 a roles_path=${WORKSPACE}/roles" ${WORKSPACE}/deploy/ansible.cfg'
             }
         }
 
         stage('Run Ansible playbook') {
             steps {
-                script {
-                    def tags = ""
-
-                    if (params.ansible_tags) {
-                        tags = "--tags ${params.ansible_tags}"
-                    }
-
-                    ansiblePlaybook(
-                        become: true,
-                        colorized: true,
-                        credentialsId: 'private-key',
-                        disableHostKeyChecking: true,
-                        installation: 'ansible',
-                        inventory: "inventory/${params.inventory}",
-                        playbook: 'playbooks/site.yml',
-                        extras: tags
-                    )
-                }
+                ansiblePlaybook(
+                    become: true,
+                    colorized: true,
+                    credentialsId: 'private-key',
+                    disableHostKeyChecking: true,
+                    installation: 'ansible',
+                    inventory: 'inventory/${inventory}',
+                    playbook: 'playbooks/deploy-todo.yml'
+                )
             }
         }
 
-        stage('Clean Workspace after build') {
+        stage('Clean Workspace') {
             steps {
-                cleanWs(
-                    cleanWhenAborted: true,
-                    cleanWhenFailure: true,
-                    cleanWhenNotBuilt: true,
-                    cleanWhenUnstable: true,
-                    deleteDirs: true
-                )
+                cleanWs()
             }
         }
     }
