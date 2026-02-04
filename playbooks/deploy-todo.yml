@@ -1,0 +1,84 @@
+---
+- name: Deploy TODO app to dev servers
+  hosts: todo
+  become: true
+  
+  vars:
+    app_repo: "https://github.com/LydiahLaw/php-todo.git"
+    app_branch: "main"
+    deploy_dir: "/var/www/todo"
+    
+  tasks:
+    - name: Install git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+    
+    - name: Clone or update repository
+      git:
+        repo: "{{ app_repo }}"
+        dest: "{{ deploy_dir }}"
+        version: "{{ app_branch }}"
+        force: yes
+      become_user: www-data
+    
+    - name: Copy .env file
+      copy:
+        src: "{{ deploy_dir }}/.env.sample"
+        dest: "{{ deploy_dir }}/.env"
+        remote_src: yes
+        owner: www-data
+        group: www-data
+    
+    - name: Update .env with database settings
+      lineinfile:
+        path: "{{ deploy_dir }}/.env"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^DB_HOST=', line: 'DB_HOST=172.31.24.191' }
+        - { regexp: '^DB_DATABASE=', line: 'DB_DATABASE=homestead' }
+        - { regexp: '^DB_USERNAME=', line: 'DB_USERNAME=homestead' }
+        - { regexp: '^DB_PASSWORD=', line: 'DB_PASSWORD=sePret^i' }
+    
+    - name: Install Composer dependencies
+      composer:
+        command: install
+        working_dir: "{{ deploy_dir }}"
+        no_dev: yes
+      become_user: www-data
+    
+    - name: Generate application key
+      command: php artisan key:generate --force
+      args:
+        chdir: "{{ deploy_dir }}"
+      become_user: www-data
+    
+    - name: Run migrations
+      command: php artisan migrate --force
+      args:
+        chdir: "{{ deploy_dir }}"
+      become_user: www-data
+    
+    - name: Clear caches
+      command: "{{ item }}"
+      args:
+        chdir: "{{ deploy_dir }}"
+      loop:
+        - php artisan config:clear
+        - php artisan cache:clear
+      become_user: www-data
+      ignore_errors: yes
+    
+    - name: Set permissions
+      file:
+        path: "{{ deploy_dir }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+    
+    - name: Restart Nginx
+      systemd:
+        name: nginx
+        state: restarted
